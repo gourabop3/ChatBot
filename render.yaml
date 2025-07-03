@@ -51,9 +51,6 @@ services:
         source: /*
         destination: /index.html
 
-# Database
-databases:
-  - name: cursor-ai-db
-    databaseName: cursor_ai
-    user: cursor_admin
-    plan: starter
+# Note: MongoDB is not directly supported by Render
+# You'll need to use MongoDB Atlas or another external MongoDB service
+# The MONGODB_URI environment variable should point to your external MongoDB instance
