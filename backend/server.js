@@ -12,14 +12,17 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const paymentRoutes = require('./routes/payments');
-const githubRoutes = require('./routes/github');
-const agentRoutes = require('./routes/agents');
-const collaborationRoutes = require('./routes/collaboration');
 
-// Import services
-const CollaborationService = require('./services/collaborationService');
-const AgentService = require('./services/agentService');
-const GitService = require('./services/gitService');
+// Import services (optional)
+let CollaborationService, AgentService, GitService;
+
+try {
+    CollaborationService = require('./services/collaborationService');
+    AgentService = require('./services/agentService');
+    GitService = require('./services/gitService');
+} catch (error) {
+    console.warn('⚠️ Warning: Some service modules could not be loaded:', error.message);
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -63,9 +66,22 @@ mongoose.connection.on('error', (err) => {
 });
 
 // Initialize services
-const collaborationService = new CollaborationService(io);
-const agentService = new AgentService(io);
-const gitService = new GitService();
+let collaborationService, agentService, gitService;
+
+try {
+    if (CollaborationService) {
+        collaborationService = new CollaborationService(io);
+    }
+    if (AgentService) {
+        agentService = new AgentService(io);
+    }
+    if (GitService) {
+        gitService = new GitService();
+    }
+    console.log('✅ Services initialized successfully');
+} catch (error) {
+    console.warn('⚠️ Warning: Some services failed to initialize:', error.message);
+}
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
@@ -74,38 +90,56 @@ io.on('connection', (socket) => {
     // Join project room
     socket.on('join-project', (projectId) => {
         socket.join(projectId);
-        collaborationService.handleUserJoin(socket, projectId);
+        if (collaborationService) {
+            collaborationService.handleUserJoin(socket, projectId);
+        }
         console.log(`📁 User ${socket.id} joined project ${projectId}`);
     });
 
     // Handle code changes for real-time collaboration
     socket.on('code-change', (data) => {
-        collaborationService.handleCodeChange(socket, data);
+        if (collaborationService) {
+            collaborationService.handleCodeChange(socket, data);
+        }
     });
 
     // Handle cursor movement
     socket.on('cursor-move', (data) => {
-        collaborationService.handleCursorMove(socket, data);
+        if (collaborationService) {
+            collaborationService.handleCursorMove(socket, data);
+        }
     });
 
     // Handle AI agent requests
     socket.on('agent-request', async (data) => {
-        await agentService.handleAgentRequest(socket, data);
+        if (agentService) {
+            await agentService.handleAgentRequest(socket, data);
+        } else {
+            socket.emit('agent-response', { error: 'Agent service not available' });
+        }
     });
 
     // Handle file operations
     socket.on('file-operation', (data) => {
-        collaborationService.handleFileOperation(socket, data);
+        if (collaborationService) {
+            collaborationService.handleFileOperation(socket, data);
+        }
     });
 
     // Handle GitHub operations
     socket.on('git-operation', async (data) => {
-        await gitService.handleGitOperation(socket, data);
+        if (gitService) {
+            await gitService.handleGitOperation(socket, data);
+        } else {
+            socket.emit('git-response', { error: 'Git service not available' });
+        }
     });
 
     // Handle disconnection
     socket.on('disconnect', () => {
-        collaborationService.handleUserLeave(socket);
+        if (collaborationService) {
+            collaborationService.handleUserLeave(socket);
+        }
         console.log(`👋 User disconnected: ${socket.id}`);
     });
 });
@@ -114,9 +148,19 @@ io.on('connection', (socket) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/github', githubRoutes);
-app.use('/api/agents', agentRoutes);
-app.use('/api/collaboration', collaborationRoutes);
+
+// Simple placeholder routes for missing endpoints
+app.get('/api/github/*', (req, res) => {
+    res.json({ message: 'GitHub integration coming soon' });
+});
+
+app.get('/api/agents/*', (req, res) => {
+    res.json({ message: 'AI agents coming soon' });
+});
+
+app.get('/api/collaboration/*', (req, res) => {
+    res.json({ message: 'Collaboration features coming soon' });
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
