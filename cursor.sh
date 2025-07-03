@@ -1,8 +1,8 @@
-THIS SHOULD BE A LINTER ERROR#!/bin/bash
+#!/bin/bash
 
-# Cursor AI - Development Setup for Cursor IDE
-echo "🎯 Cursor AI - Optimized Development Setup for Cursor IDE"
-echo "========================================================"
+# AI Code Editor IDE - Development Setup Script
+echo "🤖 AI Code Editor IDE - Complete Development Environment Setup"
+echo "=============================================================="
 
 # Colors for output
 RED='\033[0;31m'
