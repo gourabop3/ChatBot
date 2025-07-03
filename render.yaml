@@ -1,0 +1,59 @@
+services:
+  # Backend API Service
+  - type: web
+    name: cursor-ai-backend
+    env: node
+    plan: starter
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: cursor-ai-frontend
+          property: url
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        fromDatabase:
+          name: cursor-ai-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: STRIPE_SECRET_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false  # Set manually in Render dashboard
+      - key: GITHUB_CLIENT_ID
+        sync: false  # Set manually in Render dashboard
+      - key: GITHUB_CLIENT_SECRET
+        sync: false  # Set manually in Render dashboard
+    healthCheckPath: /api/health
+
+  # Frontend Static Service
+  - type: web
+    name: cursor-ai-frontend
+    env: static
+    buildCommand: |
+      # Update the frontend to use the backend URL
+      sed -i 's|http://localhost:5000|https://cursor-ai-backend.onrender.com|g' script.js
+      # No build needed for static files
+      echo "Frontend ready"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+# Database
+databases:
+  - name: cursor-ai-db
+    databaseName: cursor_ai
+    user: cursor_admin
+    plan: starter
