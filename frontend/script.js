@@ -31,7 +31,7 @@ class CursorAI {
         } else {
             // In production, construct the backend URL
             // This assumes your backend service is named 'cursor-ai-backend' on Render
-            return `https://cursor-ai-backend.onrender.com`;
+            return `https://chatbot-vyqc.onrender.com`;
         }
     }
 
