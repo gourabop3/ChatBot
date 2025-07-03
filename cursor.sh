@@ -1,4 +1,4 @@
-#!/bin/bash
+THIS SHOULD BE A LINTER ERROR#!/bin/bash
 
 # Cursor AI - Development Setup for Cursor IDE
 echo "🎯 Cursor AI - Optimized Development Setup for Cursor IDE"
