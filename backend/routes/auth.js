@@ -4,7 +4,15 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const GitService = require('../services/gitService');
+
+// Optional GitService import
+let GitService;
+try {
+    GitService = require('../services/gitService');
+} catch (error) {
+    console.warn('⚠️ GitService not available:', error.message);
+}
+
 const router = express.Router();
 
 // Generate JWT token
@@ -242,6 +250,12 @@ router.put('/password', auth, [
 // GitHub OAuth - Get authorization URL
 router.get('/github/url', (req, res) => {
     try {
+        if (!GitService) {
+            return res.status(503).json({ 
+                error: 'GitHub integration is currently unavailable' 
+            });
+        }
+
         const state = require('crypto').randomBytes(16).toString('hex');
         const redirectUri = `${process.env.FRONTEND_URL}/auth/github/callback`;
         
@@ -269,6 +283,12 @@ router.post('/github/callback', [
     body('state').notEmpty().withMessage('State parameter is required')
 ], async (req, res) => {
     try {
+        if (!GitService) {
+            return res.status(503).json({ 
+                error: 'GitHub integration is currently unavailable' 
+            });
+        }
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -283,8 +303,15 @@ router.post('/github/callback', [
             code
         );
 
-        // Get GitHub user info
-        const octokit = new (require('octokit').Octokit)({ auth: accessToken });
+        // Get GitHub user info - Try to load octokit dynamically
+        let octokit;
+        try {
+            const { Octokit } = require('octokit');
+            octokit = new Octokit({ auth: accessToken });
+        } catch (error) {
+            throw new Error('GitHub integration dependencies not available');
+        }
+        
         const { data: githubUser } = await octokit.rest.users.getAuthenticated();
 
         // Check if user exists with this GitHub ID
@@ -355,6 +382,12 @@ router.post('/github/connect', auth, [
     body('code').notEmpty().withMessage('Authorization code is required')
 ], async (req, res) => {
     try {
+        if (!GitService) {
+            return res.status(503).json({ 
+                error: 'GitHub integration is currently unavailable' 
+            });
+        }
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -369,8 +402,15 @@ router.post('/github/connect', auth, [
             code
         );
 
-        // Get GitHub user info
-        const octokit = new (require('octokit').Octokit)({ auth: accessToken });
+        // Get GitHub user info - Try to load octokit dynamically
+        let octokit;
+        try {
+            const { Octokit } = require('octokit');
+            octokit = new Octokit({ auth: accessToken });
+        } catch (error) {
+            throw new Error('GitHub integration dependencies not available');
+        }
+        
         const { data: githubUser } = await octokit.rest.users.getAuthenticated();
 
         // Check if GitHub account is already connected to another user
