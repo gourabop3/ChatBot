@@ -42,10 +42,11 @@ services:
     env: static
     buildCommand: |
       # Update the frontend to use the backend URL
+      cd frontend
       sed -i 's|http://localhost:5000|https://cursor-ai-backend.onrender.com|g' script.js
       # No build needed for static files
       echo "Frontend ready"
-    staticPublishPath: .
+    staticPublishPath: frontend
     routes:
       - type: rewrite
         source: /*

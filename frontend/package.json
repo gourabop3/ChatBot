@@ -1,0 +1,30 @@
+{
+  "name": "cursor-ai-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Cursor AI Code Editor Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo 'Frontend is a static site - no start script needed'",
+    "build": "echo 'No build step required for static frontend'",
+    "deploy": "echo 'Deploy to static hosting service'"
+  },
+  "keywords": [
+    "cursor-ai",
+    "code-editor",
+    "frontend",
+    "monaco-editor",
+    "ai"
+  ],
+  "author": "Cursor AI Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

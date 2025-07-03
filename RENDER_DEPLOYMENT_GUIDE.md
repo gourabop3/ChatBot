@@ -88,7 +88,7 @@ If blueprint doesn't work, deploy manually:
    - Connect your GitHub repo
    - Name: `cursor-ai-frontend`
    - Build Command: `echo "No build needed"`
-   - Publish Directory: `.`
+   - Publish Directory: `frontend`
 
 ### Step 3: Configure Environment Variables
 
