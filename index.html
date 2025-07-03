@@ -3,20 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Chatbot</title>
+    <title>Cursor AI - Code Editor</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>Gemini Chatbot</h1>
+    <div class="editor-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-code"></i>
+                    <span>Cursor AI</span>
+                </div>
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab active" data-panel="explorer">
+                        <i class="fas fa-folder"></i>
+                    </button>
+                    <button class="sidebar-tab" data-panel="search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="sidebar-tab" data-panel="ai-chat">
+                        <i class="fas fa-robot"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- File Explorer Panel -->
+            <div class="sidebar-panel" id="explorer-panel">
+                <div class="panel-header">
+                    <h3>Explorer</h3>
+                    <button class="btn-icon" id="new-file-btn" title="New File">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="file-tree" id="file-tree">
+                    <!-- File tree will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Search Panel -->
+            <div class="sidebar-panel hidden" id="search-panel">
+                <div class="panel-header">
+                    <h3>Search</h3>
+                </div>
+                <div class="search-content">
+                    <input type="text" id="search-input" placeholder="Search in files...">
+                    <div class="search-results" id="search-results"></div>
+                </div>
+            </div>
+
+            <!-- AI Chat Panel -->
+            <div class="sidebar-panel hidden" id="ai-chat-panel">
+                <div class="panel-header">
+                    <h3>AI Assistant</h3>
+                </div>
+                <div class="chat-content">
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <input type="text" id="user-input" placeholder="Ask about your code...">
+                        <button id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-input-container">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button id="send-button">Send</button>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <div class="tabs" id="tabs"></div>
+                <div class="tab-actions">
+                    <button class="btn-icon" id="split-editor-btn" title="Split Editor">
+                        <i class="fas fa-columns"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <div class="editor-wrapper">
+                    <div class="editor-placeholder" id="editor-placeholder">
+                        <div class="welcome-screen">
+                            <i class="fas fa-code"></i>
+                            <h2>Welcome to Cursor AI</h2>
+                            <p>Create a new file or open an existing one to start coding</p>
+                            <button class="btn-primary" id="create-file-btn">Create New File</button>
+                        </div>
+                    </div>
+                    <div class="monaco-editor" id="monaco-editor"></div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span id="cursor-position">Ln 1, Col 1</span>
+                    <span id="file-language">Plain Text</span>
+                </div>
+                <div class="status-right">
+                    <span id="file-encoding">UTF-8</span>
+                    <button class="btn-icon" id="ai-suggest-btn" title="AI Suggestions">
+                        <i class="fas fa-magic"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu hidden" id="context-menu">
+        <div class="context-item" data-action="rename">
+            <i class="fas fa-edit"></i> Rename
+        </div>
+        <div class="context-item" data-action="delete">
+            <i class="fas fa-trash"></i> Delete
+        </div>
+        <div class="context-item" data-action="download">
+            <i class="fas fa-download"></i> Download
+        </div>
+    </div>
+
+    <!-- File Upload Input -->
+    <input type="file" id="file-upload" multiple style="display: none;">
+
     <script src="script.js"></script>
 </body>
 </html>
